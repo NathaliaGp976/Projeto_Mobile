@@ -11,7 +11,3 @@ export const CampoTexto = styled.TextInput<CampoDeTextoProps>`
     padding: 20px;
     border: 2px solid ${({ hasError } :{hasError: boolean}) => (hasError ? '#D72638' : '#BDB2FF')};
 `;
-
-
-
-

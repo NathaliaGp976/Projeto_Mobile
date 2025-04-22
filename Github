@@ -1,6 +1,0 @@
-git init
-git status
-git add . 
-git commit -m " sla "
-git remote add origin 
-

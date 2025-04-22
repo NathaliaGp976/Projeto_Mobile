@@ -1,122 +1,151 @@
-
 import styled from "styled-components/native";
-import Title from "../components/Titulos/Titulo/titulo";
 import { useEffect, useState } from "react";
-import ImputTexto from "@/components/Titulos/imput/imput";
-import { TouchableOpacity } from "react-native";
-import { MaterialIcons } from '@expo/vector-icons'; // Importa ícones do Expo
+import Entypo from '@expo/vector-icons/Entypo';
+import { Pressable, View, Text, Alert } from "react-native";
+import Title from "@/components/Titulos/Titulo/titulo";
+import InputTexto from "@/components/Titulos/imput/imput";
 
-export default function App() {
-  const [email, setEmail] = useState('example@example.com');
-  const [erroEmail, setHasEmailError] = useState(false);
+export default function Cadastro()
+{
+    const [email, setEmail] =  useState('')
+    const [erroEmail, setErroEmail] = useState(false)
 
-  const [senha, setSenha] = useState('@Example123');
-  const [erroSenha, setHasSenhaError] = useState(false);
+    const [senha, setSenha] = useState('')
+    const [erroSenha, setErroSenha] = useState(false)
 
-  const [senhaVisivel, setSenhaVisivel] = useState(false); // Estado para exibir a senha
+    const [confirmarSenha, setConfirmarSenha] = useState('')
+    const [erroConfirmar, setErroConfirmar] = useState(false)
 
-  useEffect(() => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setHasEmailError(!emailRegex.test(email));
-  }, [email]);
+    const [senhaVisivel, setSenhaVisivel] = useState(true)
 
-  useEffect(() => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
-    setHasSenhaError(!passwordRegex.test(senha));
-  }, [senha]);
+    // Validação de e-mail
+    useEffect(() => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        setErroEmail(!emailRegex.test(email));
+    }, [email]);
 
-  return (
-    <Tela>
-      <Title Texto={"Entrar"} flag={true} />
-      <Title Texto={"Bem-vindo ao app"} flag={false} />
-      <ContainerCampoTexto>
-        <ViewInput>
-          <ImputTexto
-            hasError={erroEmail}
-            placeholder="Digite seu email..."
-            onChangeText={Text => setEmail(Text)}
-          />
-          {erroEmail && <TextErrorHint>Email inválido</TextErrorHint>}
-        </ViewInput>
+    // Validação de senha
+    useEffect(() => {
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+        setErroSenha(!passwordRegex.test(senha));
+    }, [senha]);
 
-        <ViewInput>
-          <SenhaWrapper>
-            <ImputTexto
-              hasError={erroSenha}
-              placeholder="Digite sua senha..."
-              onChangeText={text => setSenha(text)}
-              secureTextEntry={!senhaVisivel} // Alterna entre senha oculta/visível
-            />
-            <TouchableOpacity onPress={() => setSenhaVisivel(!senhaVisivel)}>
-              <MaterialIcons
-                name={senhaVisivel ? "visibility-off" : "visibility"}
-                size={24}
-                color="#555"
-              />
-            </TouchableOpacity>
-          </SenhaWrapper>
-          {erroSenha && <TextErrorHint>Senha inválida</TextErrorHint>}
-        </ViewInput>
-      </ContainerCampoTexto>
+    // Confirmação de senha
+    useEffect(() => {
+        setErroConfirmar(confirmarSenha !== senha || confirmarSenha === '');
+    }, [confirmarSenha, senha]);
 
-      <ContainerBotoes>
-        <Botao>
-          <TextoBotao>Entrar</TextoBotao>
-        </Botao>
-        <Links>Cadastre-se</Links>
-        <Links>Esqueci a senha</Links>
-      </ContainerBotoes>
-    </Tela>
-  );
+    // Envio do formulário
+    const handleCadastro = () => {
+        if (!erroEmail && !erroSenha && !erroConfirmar) {
+            Alert.alert("Cadastro realizado com sucesso!", `Email: ${email}`);
+        } else {
+            Alert.alert("Erro no cadastro", "Verifique os dados preenchidos.");
+        }
+    }
+
+    return (
+        <Container>
+            <Title Texto="Cadastro" flag={true} />
+
+            <ContainerInput error={erroEmail}>
+                <InputTexto
+                    placeholder="Email"
+                    value={email}
+                    onChangeText={setEmail}
+                />
+            </ContainerInput>
+            {erroEmail && <MensagemErro>Email inválido.</MensagemErro>}
+
+            <ContainerInput error={erroSenha}>
+                <ContainerSenha>
+                    <InputTexto
+                        placeholder="Senha"
+                        secureTextEntry={senhaVisivel}
+                        value={senha}
+                        onChangeText={setSenha}
+                    />
+                    <IconeVisivel onPress={() => setSenhaVisivel(!senhaVisivel)}>
+                        <Entypo name={senhaVisivel ? "eye" : "eye-with-line"} size={24} color="black" />
+                    </IconeVisivel>
+                </ContainerSenha>
+            </ContainerInput>
+            {erroSenha && (
+                <MensagemErro>
+                    A senha deve conter no mínimo 8 caracteres, uma letra maiúscula, um número e um símbolo.
+                </MensagemErro>
+            )}
+
+            <ContainerInput error={erroConfirmar}>
+                <InputTexto
+                    placeholder="Confirmar Senha"
+                    secureTextEntry={senhaVisivel}
+                    value={confirmarSenha}
+                    onChangeText={setConfirmarSenha}
+                />
+            </ContainerInput>
+            {erroConfirmar && <MensagemErro>As senhas não coincidem.</MensagemErro>}
+
+            <Botao onPress={handleCadastro}>
+                <TextoBotao>Cadastrar</TextoBotao>
+            </Botao>
+        </Container>
+    )
 }
 
-// 📌 Estilizações
-const Tela = styled.View`
-  flex: 1;
-  background-color: #e2eafc;
-  padding: 65px;
+// Estilos
+const Container = styled.View`
+    flex: 1;
+    align-items: center;
+    background-color: #e2eafc;
+    padding: 100px 30px;
+    gap: 20px;
 `;
 
-const ContainerCampoTexto = styled.View`
-  gap: 25px;
+// Container para input com borda condicional
+const ContainerInput = styled.View<{ error: boolean }>`
+    width: 100%;
+    border: 2px solid ${props => (props.error ? 'red' : '#ccc')};
+    border-radius: 8px;
+    padding: 5px;
 `;
 
-const ViewInput = styled.View`
-  width: 100%;
+// Input com botão de visualização de senha
+const ContainerSenha = styled.View`
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
 `;
 
-const SenhaWrapper = styled.View`
-  flex-direction: row;
-  align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
+// Botão do olhinho
+const IconeVisivel = styled(Pressable)`
+    padding: 10px;
+    margin-left: -40px;
+    background-color: #bdb2ff;
+    border-radius: 30px;
 `;
 
-const ContainerBotoes = styled.View`
-  margin-top: 30px;
-  gap: 20px;
-`;
-
+// Botão principal
 const Botao = styled.Pressable`
-  background-color: #bdb2ff;
-  border-radius: 30px;
-  padding: 20px;
+    background-color: #6c63ff;
+    padding: 15px 30px;
+    border-radius: 10px;
+    margin-top: 10px;
 `;
 
+// Texto do botão
 const TextoBotao = styled.Text`
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
 `;
 
-const Links = styled.Text`
-  text-align: center;
-  color: #000000;
-  font-size: 16px;
-`;
-
-const TextErrorHint = styled.Text`
-  font-size: 16px;
-  color: #e63946;
+// Mensagem de erro
+const MensagemErro = styled.Text`
+    color: red;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: left;
 `;
